@@ -3,9 +3,23 @@ from typing import Union
 from database import supabase
 from fastapi import FastAPI
 from upstash_redis import Redis
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 redis = Redis.from_env()
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
