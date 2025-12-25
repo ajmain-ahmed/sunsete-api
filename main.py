@@ -34,4 +34,4 @@ def define(word: str):
 
     data = supabase.rpc('def', params={'word': word}).execute()
     redis.setex(cache_key, 21600, data.data)
-    return {'source':'api', 'data':data}
+    return {'source':'api', 'data':data.data}
