@@ -1,5 +1,4 @@
 import json
-from typing import Union
 from database import supabase
 from fastapi import FastAPI
 from upstash_redis import Redis
