@@ -30,8 +30,8 @@ def define(word: str):
     
     cached_data =  redis.get(cache_key)
     if cached_data:
-        return {'source': 'cache', 'data': json.loads(cached_data)}
+        return {'source': 'cache', 'query': word, 'data': json.loads(cached_data)}
 
     data = supabase.rpc('def', params={'word': word}).execute()
     redis.setex(cache_key, 21600, data.data)
-    return {'source':'api', 'data':data.data}
+    return {'source':'api', 'query': word, 'data':data.data}
