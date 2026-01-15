@@ -32,7 +32,7 @@ def read_root():
     return {
             "Welcome": "to sunsete-api",
             "Query": "any Japanese word, in both English and Japanese!",
-            "Example": "https://sunsete-api.vercel.app/v1/define/日本",
+            "Example": "https://sunsete-api.vercel.app/v1/define/London",
             "Developer": "Ajmain Ahmed",
             "Github": "https://github.com/ajmain-ahmed/sunsete-api"
             }
