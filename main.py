@@ -29,7 +29,13 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"Welcome": "to sunsete-api"}
+    return {
+            "Welcome": "to sunsete-api",
+            "Query": "any Japanese word!",
+            "Example": "https://sunsete-api.vercel.app/v1/define/日本",
+            "Developer": "Ajmain Ahmed",
+            "Github": "https://github.com/ajmain-ahmed/sunsete-api"
+            }
 
 @app.get("/v1/define/{word}")
 def define(word: str, request: Request):
