@@ -33,7 +33,7 @@ def read_root():
             "Welcome": "to sunsete-api",
             "Features": "Query any Japanese word, in both English and Japanese, with pagination!",
             "Example 1": "https://sunsete-api.vercel.app/v1/define/london",
-            "Example 1": "https://sunsete-api.vercel.app/v1/define/life/?page=2",
+            "Example 2": "https://sunsete-api.vercel.app/v1/define/life/?page=2",
             "Developer": "Ajmain Ahmed",
             "Github": "https://github.com/ajmain-ahmed/sunsete-api"
             }
