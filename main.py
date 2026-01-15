@@ -38,22 +38,70 @@ def read_root():
             }
 
 @app.get("/v1/define/{word}")
-def define(word: str, request: Request):
+@app.get("/v1/define/{word}/")
+@app.get("/v1/define/{word}/?page={page}")
+def define(word: str, request: Request, page: int = 0):
 
-    cache_key = word
+    page = max(page, 0)
+    
+    cache_key = f"{word}:{page}"
     client_host = request.client.host or 'unknown'
     response = ratelimit.limit(client_host)
 
     if not response.allowed:
-        return {'source':f'{client_host}', 'query': word, 'data':'rate limited', 'error': True}
+        return {
+            'source': f'{client_host}', 
+            'query': word, 
+            'page': page,
+            'data': 'rate limited', 
+            'error': True,
+            'rate_limit_info': {
+                'remaining': response.remaining,
+                'reset': response.reset
+            }
+        }
 
-    cached_data =  redis.get(cache_key)
+    cached_data = redis.get(cache_key)
     if cached_data:
-        return {'source': 'cache', 'query': word, 'data': json.loads(cached_data), 'error': False}
+        return {
+            'source': 'cache', 
+            'query': word, 
+            'page': page,
+            'data': json.loads(cached_data), 
+            'error': False
+        }
 
-    data = supabase.rpc('def', params={'word': word}).execute()
-    if data.data is not None:
-        redis.setex(cache_key, 21600, data.data)
-        return {'source':'api', 'query': word, 'data':data.data, 'error': False}
+    data = supabase.rpc('def', params={'word': word, 'page': page}).execute()
+    
+    if data.data is not None and len(data.data) > 0:
+       
+        redis.setex(cache_key, 21600, json.dumps(data.data))
+        return {
+            'source': 'api', 
+            'query': word, 
+            'page': page,
+            'data': data.data, 
+            'error': False,
+            'count': len(data.data)
+        }
+    elif data.data is not None and len(data.data) == 0:
+      
+        return {
+            'source': 'api', 
+            'query': word, 
+            'page': page,
+            'data': [], 
+            'error': False,
+            'message': 'No results found',
+            'count': 0
+        }
     else:
-        return {'source':'api', 'query': word, 'data':None, 'error': True}
+       
+        return {
+            'source': 'api', 
+            'query': word, 
+            'page': page,
+            'data': None, 
+            'error': True,
+            'message': 'Database query failed'
+        }
