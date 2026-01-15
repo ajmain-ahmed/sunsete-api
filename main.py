@@ -48,6 +48,7 @@ def define(word: str, request: Request, page: int = 0):
     client_host = request.client.host or 'unknown'
     response = ratelimit.limit(client_host)
 
+    # if they've been rate limited
     if not response.allowed:
         return {
             'source': f'{client_host}', 
@@ -55,12 +56,9 @@ def define(word: str, request: Request, page: int = 0):
             'page': page,
             'data': 'rate limited', 
             'error': True,
-            'rate_limit_info': {
-                'remaining': response.remaining,
-                'reset': response.reset
-            }
         }
-
+    
+    # if data is in cache, respond with it
     cached_data = redis.get(cache_key)
     if cached_data:
         return {
@@ -70,12 +68,14 @@ def define(word: str, request: Request, page: int = 0):
             'data': json.loads(cached_data), 
             'error': False
         }
-
-    data = supabase.rpc('def', params={'word': word, 'page': page}).execute()
     
+    # if data isn't in cache, send query to db
+    data = supabase.rpc('def', params={'word': word, 'page': page}).execute()
+
+    # if we get a valid response with data present
     if data.data is not None and len(data.data) > 0:
        
-        redis.setex(cache_key, 21600, json.dumps(data.data))
+        redis.setex(cache_key, 21600, data.data)
         return {
             'source': 'api', 
             'query': word, 
@@ -84,6 +84,8 @@ def define(word: str, request: Request, page: int = 0):
             'error': False,
             'count': len(data.data)
         }
+    
+    # if there's a response but no data
     elif data.data is not None and len(data.data) == 0:
       
         return {
@@ -95,6 +97,8 @@ def define(word: str, request: Request, page: int = 0):
             'message': 'No results found',
             'count': 0
         }
+    
+    # if there's no response at all
     else:
        
         return {
