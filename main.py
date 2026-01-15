@@ -31,8 +31,9 @@ app.add_middleware(
 def read_root():
     return {
             "Welcome": "to sunsete-api",
-            "Query": "any Japanese word, in both English and Japanese!",
-            "Example": "https://sunsete-api.vercel.app/v1/define/London",
+            "Features": "Query any Japanese word, in both English and Japanese, with pagination!",
+            "Example 1": "https://sunsete-api.vercel.app/v1/define/london",
+            "Example 1": "https://sunsete-api.vercel.app/v1/define/life/?page=2",
             "Developer": "Ajmain Ahmed",
             "Github": "https://github.com/ajmain-ahmed/sunsete-api"
             }
